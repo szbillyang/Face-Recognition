@@ -5,11 +5,7 @@ import logo from './Logo.png';
 import './Logo.css';
 
 const Logo = () => {
-  console.log('Logo Component is rendering');
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
-
-  // Debugging console log to check if the condition is working
-  console.log('isMobile:', isMobile);
 
   return (
     <>

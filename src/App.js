@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-// import Particles from 'react-particles-js'; 
 import ParticlesBg from 'particles-bg'
-import Clarifai from 'clarifai';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Navigation from './components/Navigation/Navigation';
 import Signin from './components/Signin/Signin';
@@ -11,23 +9,11 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import './App.css';
 
-//You must add your own API key here from Clarifai.
-const app = new Clarifai.App({
- apiKey: 'df8cd69a52854dafbfff3338aed32d98'
-});
 
-// No Longer need this. Updated to particles-bg
-// const particlesOptions = {
-//   particles: {
-//     number: {
-//       value: 30,
-//       density: {
-//         enable: true,
-//         value_area: 800
-//       }
-//     }
-//   }
-// }
+
+
+
+
 
 class App extends Component {
   constructor() {
@@ -35,12 +21,12 @@ class App extends Component {
     this.state = {
       input: '',
       imageUrl: '',
-      box: {},
-      route: 'home',
+      box: [],
+      route: 'signin',
       isSignedIn: false,
       user: {
         id: '',
-        name: '',
+        name: 'Guest',
         email: '',
         entries: 0,
         joined: ''
@@ -59,20 +45,27 @@ class App extends Component {
   }
 
   calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById('inputimage');
-    const width = Number(image.width);
-    const height = Number(image.height);
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
-    }
-  }
+    // Iterate over each face data to calculate positions for each bounding box
+    return data.map(face => {
+      const clarifaiFace = face.boundingBox;
+  
+      // Get image dimensions
+      const image = document.getElementById('inputimage');
+      const width = Number(image.width);
+      const height = Number(image.height);
+  
+      return {
+        leftCol: Number(clarifaiFace.leftCol) * width,
+        topRow: Number(clarifaiFace.topRow) * height,
+        rightCol: width - (Number(clarifaiFace.rightCol) * width),
+        bottomRow: height - (Number(clarifaiFace.bottomRow) * height)
+      };
+    });
+  };
+  
 
-  displayFaceBox = (box) => {
-    this.setState({box: box});
+  displayFaceBox = (boxes) => {
+    this.setState({box: boxes});
   }
 
   onInputChange = (event) => {
@@ -80,34 +73,44 @@ class App extends Component {
   }
 
   onButtonSubmit = () => {
-    this.setState({imageUrl: this.state.input});
-   
-    // HEADS UP! Sometimes the Clarifai Models can be down or not working as they are constantly getting updated.
-    // A good way to check if the model you are using is up, is to check them on the clarifai website. For example,
-    // for the Face Detect Mode: https://www.clarifai.com/models/face-detection
-    // If that isn't working, then that means you will have to wait until their servers are back up. 
+    this.setState({ imageUrl: this.state.input });
+  
+    fetch('http://localhost:3000/api/image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageUrl: this.state.input })
+    })
+      .then(response => response.json())
+      .then(result => {
+        console.log('Face Data:', result);
+        if (result && result.length > 0) {
+          // Calculate and display bounding boxes for all detected faces
+          const boxes = this.calculateFaceLocation(result);
 
-    app.models.predict('face-detection', this.state.input)
-      .then(response => {
-        console.log('hi', response)
-        if (response) {
-          fetch('http://localhost:3000/image', {
-            method: 'put',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-              id: this.state.user.id
-            })
-          })
-            .then(response => response.json())
-            .then(count => {
-              this.setState(Object.assign(this.state.user, { entries: count}))
-            })
-
+          this.displayFaceBox(boxes);
         }
-        this.displayFaceBox(this.calculateFaceLocation(response))
       })
-      .catch(err => console.log(err));
-  }
+      .catch(error => console.log('Error fetching Clarifai data from backend:', error)); 
+         // // Send PUT request to update user entries in the backend
+        // fetch('http://localhost:3000/image', {
+        //   method: 'PUT',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({
+        //     id: this.state.user.id
+        //   })
+        // })
+        //   .then(response => response.json())
+        //   .then(count => {
+        //     this.setState(Object.assign(this.state.user, { entries: count }));
+        //   })
+        //   .catch(error => console.log('Error updating user entries:', error));
+  };
+  
+
+
+
+
+
 
   onRouteChange = (route) => {
     if (route === 'signout') {
@@ -135,7 +138,7 @@ class App extends Component {
                 onInputChange={this.onInputChange}
                 onButtonSubmit={this.onButtonSubmit}
               />
-              <FaceRecognition box={box} imageUrl={imageUrl} />
+              <FaceRecognition boxes={box} imageUrl={imageUrl} />
             </div>
           : (
              route === 'signin'

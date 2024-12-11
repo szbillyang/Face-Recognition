@@ -11,23 +11,25 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
+const initialState = {
+  input: '',
+  imageUrl: '',
+  box: [],
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: 'Guest',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
+}
+
 class App extends Component {
   constructor() {
     super();
-    this.state = {
-      input: '',
-      imageUrl: '',
-      box: [],
-      route: 'signin',
-      isSignedIn: false,
-      user: {
-        id: '',
-        name: 'Guest',
-        email: '',
-        entries: 0,
-        joined: ''
-      }
-    }
+    this.state = initialState;
   }
 
   loadUser = (data) => {
@@ -108,12 +110,14 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if (route === 'signout') {
-      this.setState({ isSignedIn: false });
+      this.setState({ ...initialState, route: 'signin' }); 
     } else if (route === 'home') {
-      this.setState({ isSignedIn: true });
+      this.setState({ isSignedIn: true, route: 'home' });
+    } else {
+      this.setState({ route: route });
     }
-    this.setState({ route: route });
-  }
+  };
+  
 
   render() {
     const { isSignedIn, imageUrl, route, box } = this.state;

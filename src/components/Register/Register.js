@@ -1,4 +1,7 @@
 import React from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 class Register extends React.Component {
   constructor(props) {
@@ -23,23 +26,46 @@ class Register extends React.Component {
   }
 
   onSubmitSignIn = () => {
-    fetch('http://localhost:3000/register', {
+    const { email, password, name } = this.state;
+    if (!email || !password || !name) {
+      toast.warning("All fields are required.");
+      return;
+    }
+  
+    fetch('http://localhost:3001/register', {
       method: 'post',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: this.state.email,
-        password: this.state.password,
-        name: this.state.name
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, name }),
     })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(error => {
+            throw new Error(error.error || 'Unknown error');
+          });
+        }
+        return response.json(); // Parse JSON response
+      })
       .then(user => {
-        if (user) {
-          this.props.loadUser(user)
+        if (user.id) {
+          this.props.loadUser(user);
           this.props.onRouteChange('home');
+          toast.success("Registration successful.");
+        } else {
+          toast.error("Unable to register. Please try again.");
         }
       })
-  }
+      .catch(error => {
+        console.error('Error:', error.message);
+        if (error.message === 'User already registered') {
+          toast.info("This email is already registered. Please sign in.");
+        } else {
+          toast.error("An error occurred. Please try again later.");
+        }
+      });
+  };
+  
+  
+  
 
   render() {
     return (

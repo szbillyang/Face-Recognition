@@ -69,27 +69,42 @@ class App extends Component {
 
   onButtonSubmit = () => {
     this.setState({ imageUrl: this.state.input });
-
-    fetch('http://localhost:3000/api/image', {
+  
+    // Fetch face detection data from backend
+    fetch('http://localhost:3001/api/image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageUrl: this.state.input })
+      body: JSON.stringify({ imageUrl: this.state.input }),
     })
       .then(response => response.json())
       .then(result => {
-        console.log('Face Data:', result);
         if (result && result.length > 0) {
+          // Calculate and display face bounding boxes
           const boxes = this.calculateFaceLocation(result);
           this.displayFaceBox(boxes);
+  
+          // Update user entries in backend
+          fetch('http://localhost:3001/image', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: this.state.user.id }),
+          })
+            .then(response => response.json())
+            .then(entries => {
+              // Update the user's entries count in the state
+              this.setState(Object.assign(this.state.user, { entries }));
+            })
+            .catch(err => console.error('Error updating entries:', err));
         } else {
-          this.displayFaceBox([]);  
+          this.displayFaceBox([]);
           toast.info("No faces detected. Please try another image.");
         }
       })
       .catch(error => {
-        console.log('Error fetching Clarifai data from backend:', error);
+        console.error('Error fetching face data:', error);
       });
   };
+  
 
   onRouteChange = (route) => {
     if (route === 'signout') {

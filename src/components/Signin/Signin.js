@@ -1,5 +1,6 @@
 import React from 'react';
-
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 class Signin extends React.Component {
   constructor(props) {
@@ -19,22 +20,48 @@ class Signin extends React.Component {
   }
 
   onSubmitSignIn = () => {
-    fetch('http://localhost:3000/signin', {
+    const { signInEmail, signInPassword} = this.state;
+    if (!signInEmail || !signInPassword) {
+      toast.warning("All fields are required.");
+      return;
+    }
+
+    fetch('http://localhost:3001/signin', {
       method: 'post',
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: this.state.signInEmail,
-        password: this.state.signInPassword
-      })
+        email: signInEmail,
+        password: signInPassword,
+      }),
     })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(error => {
+            throw new Error(error.error || 'Unknown error');
+          });
+        }
+        return response.json();
+      })
       .then(user => {
-        if (user.id) {
-          this.props.loadUser(user)
+        if (user.id) { // Assuming a valid user has an id
+          this.props.loadUser(user);
           this.props.onRouteChange('home');
+          toast.success("Sign in successful.");
         }
       })
-  }
+      .catch(error => {
+        console.error('Error:', error.message);
+        if (error.message === 'Wrong password') {
+          toast.error("Incorrect password. Please try again.");
+        } else if (error.message === 'User not found') {
+          toast.error("User not found. Please register first.");
+        } else {
+          toast.error("An error occurred. Please try again later.");
+        }
+      });
+  };
+  
+  
 
   render() {
     const { onRouteChange } = this.props;

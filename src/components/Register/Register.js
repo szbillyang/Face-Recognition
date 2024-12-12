@@ -1,5 +1,5 @@
 import React from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -27,12 +27,13 @@ class Register extends React.Component {
 
   onSubmitSignIn = () => {
     const { email, password, name } = this.state;
+    backendUrl = process.env.Backend_Url;
     if (!email || !password || !name) {
       toast.warning("All fields are required.");
       return;
     }
   
-    fetch('http://localhost:3001/register', {
+    fetch('backendUrl/register', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name }),

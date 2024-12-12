@@ -11,7 +11,6 @@ const Instruction = () => {
   return (
     <Modal
       isOpen={modalIsOpen}
-      onRequestClose={() => setModalIsOpen(false)}
       contentLabel="Instructions Modal"
       className="modal-content"
       overlayClassName="modal-overlay"

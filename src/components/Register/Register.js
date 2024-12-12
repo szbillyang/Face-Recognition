@@ -27,13 +27,12 @@ class Register extends React.Component {
 
   onSubmitSignIn = () => {
     const { email, password, name } = this.state;
-    backendUrl = process.env.Backend_Url;
     if (!email || !password || !name) {
       toast.warning("All fields are required.");
       return;
     }
   
-    fetch('backendUrl/register', {
+    fetch('https://face-recognition-back-end-ymxe.onrender.com/register', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, name }),

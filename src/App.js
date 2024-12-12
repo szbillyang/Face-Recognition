@@ -71,9 +71,8 @@ class App extends Component {
 
   onButtonSubmit = () => {
     this.setState({ imageUrl: this.state.input });
-    backendUrl = process.env.Backend_Url;
     // Fetch face detection data from backend
-    fetch('backendUrl/api/image', {
+    fetch('https://face-recognition-back-end-ymxe.onrender.com/api/image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ imageUrl: this.state.input }),
@@ -86,7 +85,7 @@ class App extends Component {
           this.displayFaceBox(boxes);
   
           // Update user entries in backend
-          fetch('backendUrl/image', {
+          fetch('https://face-recognition-back-end-ymxe.onrender.com/image', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: this.state.user.id }),

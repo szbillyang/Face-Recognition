@@ -11,7 +11,7 @@ const Logo = () => {
     <>
       {!isMobile && (
         <div className='ma3 mt0 ml5'>
-          <Tilt className="Tilt br2 shadow-2" style={{ height: 200, width: 200 }}>
+          <Tilt className="Tilt br2 shadow-2" style={{ height: 100, width: 100 }}>
             <div className="Tilt-inner pa3">
               <img alt='logo' src={logo} />
             </div>

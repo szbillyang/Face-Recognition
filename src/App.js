@@ -129,7 +129,7 @@ class App extends Component {
         <ToastContainer position="top-center"/> 
         {route === 'home'
           ? <div>
-              <Logo />
+
               <Rank
                 name={this.state.user.name}
                 entries={this.state.user.entries}
@@ -139,6 +139,7 @@ class App extends Component {
                 onButtonSubmit={this.onButtonSubmit}
               />
               <FaceRecognition boxes={box} imageUrl={imageUrl} />
+              <Logo />
             </div>
           : (
             route === 'signin'

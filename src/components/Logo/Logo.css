@@ -1,4 +1,15 @@
-.Tilt {
-  background: linear-gradient(89deg, #FF5EDF 0%, #04C8DE 100%); /* w3c */
+
+
+.logo-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000; /* Ensures the logo stays above other elements */
 }
 
+.Tilt {
+  display: inline-block;
+  background: linear-gradient(89deg, #FF5EDF 0%, #04C8DE 100%);
+  border-radius: 10px;
+  cursor: pointer;
+}

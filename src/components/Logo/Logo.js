@@ -10,10 +10,10 @@ const Logo = () => {
   return (
     <>
       {!isMobile && (
-        <div className='ma3 mt0 ml5'>
+        <div className='logo-container'>
           <Tilt className="Tilt br2 shadow-2" style={{ height: 100, width: 100 }}>
             <div className="Tilt-inner pa3">
-              <img alt='logo' src={logo} />
+              <img alt='logo' src={logo} style={{ width: '100%', height: 'auto' }} />
             </div>
           </Tilt>
         </div>

@@ -8,6 +8,7 @@ import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import { ToastContainer, toast } from 'react-toastify';
+import Instruction from './components/Instruction/Instruction';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
@@ -122,6 +123,7 @@ class App extends Component {
     const { isSignedIn, imageUrl, route, box } = this.state;
     return (
       <div className="App">
+        <Instruction />
         <ParticlesBg type="square" bg={true} />
         <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
         <ToastContainer position="top-center"/> 
